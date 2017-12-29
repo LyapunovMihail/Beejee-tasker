@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
 	};
 
 	user = {
-		data: {username: "admin", password: "123", isAdmin: false},
+		data: {username: "", password: "", isAdmin: false},
 		response: {status: "", message: {}}
 	};
 
