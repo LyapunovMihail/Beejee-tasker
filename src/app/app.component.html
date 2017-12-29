@@ -1,0 +1,166 @@
+<div class="container">
+
+  <div class="dropdown mt-5 mb-5" *ngIf="user.response.status!=='ok'">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="auth" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Войти
+    </button>
+    <form class="dropdown-menu p-4">
+      <div class="form-group">
+        <label for="authEmail">Логин</label>
+        <input type="text" class="form-control" 
+        [class.is-invalid]="(authName.touched && authName.invalid) || user.response.message.username" 
+        id="authName" name="authName" placeholder="Введите имя" 
+        [(ngModel)]="user.data.username" #authName="ngModel" 
+        (input)="user.response.message.login = ''" required>
+        <div class="invalid-feedback" *ngIf="(authName.touched && authName.invalid) || user.response.message.username">Неверный логин</div>
+      </div>
+      <div class="form-group">
+        <label for="authPassword">Пароль</label>
+        <input type="password" class="form-control" 
+        [class.is-invalid]="(authPass.touched && authPass.invalid) || user.response.message.password" 
+        id="authPass" name="authPass" placeholder="Введите пароль" 
+        [(ngModel)]="user.data.password" #authPass="ngModel" 
+        (input)="user.response.message.password = ''" required> 
+        <div class="invalid-feedback" *ngIf="(authPass.touched && authPass.invalid) || user.response.message.password">Неверный пароль</div>
+      </div>
+      <button type="submit" class="btn btn-primary" (click)="authorize(user.data.username, user.data.password)">Войти</button>
+    </form>
+  </div>
+
+  <div class="mt-5 mb-5" *ngIf="user.response.status==='ok'">
+    <button type="button" class="btn btn-dark" (click)="unAuthorize()">Выход админа</button>
+  </div>
+
+  <div class="alert alert-danger mb-3" role="alert"*ngIf="get.response.status=='error'">
+    Ошибка. {{get.response.message}}
+  </div>
+
+  <div *ngIf="view.currentView=='taskList' && get.response.status=='ok'">
+    <div class="row ml-1 mb-4">
+      <div class="mr-3">
+        <button type="button" class="btn btn-sm btn-success" (click)="changeView('taskEdit')">Создать задачу +</button>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="sortMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Сортировать по</button>
+        <div class="dropdown-menu" aria-labelledby="sortMenu">
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='username'; toPage(1)">Имени пользователя</button>
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='email'; toPage(1)">Email</button>
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='status'; toPage(1)">Статусу</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row ml-1 mr-1">
+      <div class="card bg-light border-secondary mb-3 card-size" *ngFor="let task of get.response.message.tasks">
+        <h5 class="card-header">{{task.username}} 
+          <span class="text-muted">({{task.email}}) </span>
+          <span class="badge badge-info" *ngIf="!task.status">Не выполнено</span>
+          <span class="badge badge-dark" *ngIf="task.status">Выполнено</span> 
+          <button type="button" class="btn btn-sm btn-link float-right" *ngIf="user.data.isAdmin" (click)="editTask(task)">Редактировать</button>
+        </h5>         
+        <div class="card-body" style="overflow: auto">
+          <div class="max-width-100" style="display: inline-flex" >
+            <div class="img-wrapper">
+              <img [src]="task.image_path" class="rounded img-fluid img-thumbnail" alt="...">
+            </div>
+            <div class="max-width-70">
+              <p class="card-text">{{task.text}}</p>
+            </div>
+          </div>
+        </div>  
+      </div>  
+    </div>
+
+    <nav class="mb-5" *ngIf="get.response.message.total_task_count > 3">
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" (click)="toFirstPage()">&lsaquo;&lsaquo;&lsaquo;</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" (click)="prevPages()">&laquo;</a>
+        </li>
+        <li class="page-item" *ngIf="lastPage >= startPage" [class.active]="currentPage===startPage"><a class="page-link" (click)="toPage(startPage)">{{startPage}}</a></li>
+        <li class="page-item" *ngIf="lastPage >= startPage+1" [class.active]="currentPage===startPage+1"><a class="page-link" (click)="toPage(startPage+1)">{{startPage+1}}</a></li>
+        <li class="page-item" *ngIf="lastPage >= startPage+2" [class.active]="currentPage===startPage+2"><a class="page-link" (click)="toPage(startPage+2)">{{startPage+2}}</a></li>
+        <li class="page-item" *ngIf="lastPage >= startPage+3" [class.active]="currentPage===startPage+3"><a class="page-link" (click)="toPage(startPage+3)">{{startPage+3}}</a></li>
+        <li class="page-item" *ngIf="lastPage >= startPage+4" [class.active]="currentPage===startPage+4"><a class="page-link"(click)="toPage(startPage+4)">{{startPage+4}}</a></li>
+        <li class="page-item">
+          <a class="page-link" (click)="nextPages()">&raquo;</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" (click)="toLastPage()">&rsaquo;&rsaquo;&rsaquo;</a>
+        </li>
+      </ul>
+    </nav>
+  </div>    
+
+  <div *ngIf="view.currentView=='taskEdit'">
+    <form class="col-md-8">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="username">Имя пользователя</label>
+          <input type="text" class="form-control" id="username" name="username" [(ngModel)]="post.data.username" #username="ngModel" (input)="post.response.message.username = ''" required [disabled]="adminEdit">
+          <div class="error-feedback" *ngIf="(username.touched && username.invalid) || post.response.message.username">Поле является обязательным для заполнения</div>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email" name="email" [(ngModel)]="post.data.email" #email="ngModel" (input)="post.response.message.email = ''" pattern="[a-zA-Z_]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}" required [disabled]="adminEdit">
+          <div class="error-feedback" *ngIf="(email.touched && email.invalid) || post.response.message.email">Неверный имэйл</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="text">Текст задачи</label>
+        <textarea class="form-control" id="text" name="text" rows="3" [(ngModel)]="post.data.text" #text="ngModel" (input)="post.response.message.text = ''" required></textarea>
+        <div class="error-feedback" *ngIf="(text.touched && text.invalid) || post.response.message.text">Поле является обязательным для заполнения</div>
+      </div>
+
+      <div class="form-group" *ngIf="!adminEdit">    
+        <label for="exampleFormControlFile1">Выберите изображение</label>
+        <input type="file" class="form-control-file" id="exampleFormControlFile1" (change)="fileUpload(imageFile, previewImg); post.response.message.image = ''" accept="image/jpeg,image/png,image/gif" #imageFile>
+        <div class="error-feedback" *ngIf="post.response.message.image">Не загружено изображение</div>
+      </div>
+
+      <div class="form-group" *ngIf="adminEdit">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="status" [checked]="post.data.status===10" (change)="post.data.status = post.data.status===10 ? 0 : 10"> Задача выполнена
+          </label>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary float-left" data-toggle="modal" data-target=".bd-example-modal-lg" *ngIf="!adminEdit">Предварительный просмотр</button>
+
+      <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="row ml-1 mr-1">
+                <div class="card bg-light mb-3 card-size">
+                  <h5 class="card-header">{{post.data.username}} <span class="text-muted" *ngIf="post.data.email">({{post.data.email}}) </span></h5>  
+                  <div class="card-body" style="overflow: auto">
+                    <div class="max-width-100" style="display: inline-flex">
+                      <div class="img-wrapper" [style.visibility]="post.data.image ? 'visible': 'hidden'">
+                        <img [src]="" class="rounded img-fluid img-thumbnail" alt="Image" #previewImg>
+                      </div>
+                      <div class="max-width-70">
+                        <p class="card-text">{{post.data.text}}</p>
+                      </div>
+                    </div>
+                  </div> 
+                </div> 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row float-right">
+        <button type="button" class="btn btn-light mr-2" (click)="changeView('taskList')">Назад</button>
+        <button type="submit" class="btn btn-primary" (click)="postTask()" *ngIf="!adminEdit">Сохранить</button>
+        <button type="submit" class="btn btn-primary" (click)="updateTask()" *ngIf="adminEdit">Редактировать</button>
+      </div>
+    </form>
+  </div>
+
+</div>

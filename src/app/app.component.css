@@ -1,0 +1,40 @@
+.valign-middle {
+  padding-top: 15%;
+  padding-bottom: 15%;
+}
+
+.card-size {
+	width: 55rem; 
+	height: 21rem
+}
+
+.img-wrapper {
+	max-width: 320px; 
+	max-height: 240px; 
+	min-width: 80px; 
+	min-height: 60px;
+	overflow: hidden; 
+	margin-right: 20px
+}
+
+.max-width-100 {
+	max-width: 100%
+}
+
+.max-width-70 {
+	max-width: 70%
+}
+
+a {
+	cursor: pointer;
+}
+
+li.active a { 
+	cursor: auto;
+}
+
+.error-feedback {
+  margin-top: .25rem;
+  font-size: .875rem;
+  color: #dc3545;
+}
