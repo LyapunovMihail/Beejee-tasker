@@ -73,7 +73,7 @@ var AppComponent = (function () {
             response: { status: "", message: {} }
         };
         this.user = {
-            data: { username: "admin", password: "123", isAdmin: false },
+            data: { username: "", password: "", isAdmin: false },
             response: { status: "", message: {} }
         };
         this.currentPage = 1;
