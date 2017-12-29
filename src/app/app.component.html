@@ -11,7 +11,7 @@
         [class.is-invalid]="(authName.touched && authName.invalid) || user.response.message.username" 
         id="authName" name="authName" placeholder="Введите имя" 
         [(ngModel)]="user.data.username" #authName="ngModel" 
-        (input)="user.response.message.login = ''" required>
+        (input)="user.response.message.username = ''" required>
         <div class="invalid-feedback" *ngIf="(authName.touched && authName.invalid) || user.response.message.username">Неверный логин</div>
       </div>
       <div class="form-group">
