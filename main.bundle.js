@@ -135,7 +135,7 @@ var AppComponent = (function () {
         }
         if (password !== '123') {
             status = "error";
-            message.username = "Неверный пароль";
+            message.password = "Неверный пароль";
         }
         if (status !== "error") {
             status = "ok";
