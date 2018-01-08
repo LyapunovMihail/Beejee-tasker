@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 declare var $:any;
 import * as md5 from 'md5';
 
@@ -6,17 +6,6 @@ import * as md5 from 'md5';
 export class AppService {
 
   constructor() { }
-
-  public onPageChange$: EventEmitter<any> = new EventEmitter<any>();
-  public onReceiveTotalTaskCount$: EventEmitter<number> = new EventEmitter<number>();
-
-  onPageChange(pageInfo) {
-  	this.onPageChange$.emit(pageInfo)
-  }
-
-  onReceiveTotalTaskCount(count) {
-  	this.onReceiveTotalTaskCount$.emit(count)
-  }
 
   getTasks(query) {
   	var settings = {
@@ -53,19 +42,12 @@ export class AppService {
   }
 
   updateTask(data) {
-  	
-  	let masText = data.text.split("");
-  	masText.sort((a,b) => {
-	    if(a < b) return 1;
-	    if(a > b) return -1;
-	  	return 0
-		});
-		let dataText = masText.join("");
-
-		let params_string = `status=${data.status}&token=beejee`;
-
+		var params_string = `status=${data.status}&text=${data.text}&token=beejee`;
+    params_string = encodeURI(params_string);
+    
   	var form = new FormData();     
       form.append("status", data.status);
+      form.append("text", data.text);
       form.append("token", "beejee"); 
       form.append("signature", md5(params_string));
 
