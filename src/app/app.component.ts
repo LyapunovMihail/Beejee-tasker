@@ -12,8 +12,6 @@ export class AppComponent implements OnInit {
     private appService: AppService) { 
   }
 
-  view = {currentView: "taskList"};
-
 	get = {
 		data: {sort_field: "id", sort_direction: "desc", page: 1},
 		response: {status: "", message: {}}
@@ -29,12 +27,14 @@ export class AppComponent implements OnInit {
 		response: {status: "", message: {}}
 	};
 
+  view = {currentView: "taskList"};
+
+  adminEdit = false;
+  
   currentPage = 1;
   startPage = 1;
   lastPage = 1;
   pageCapacity = 3;
-
-  adminEdit = false;
 
   ngOnInit() {
     this.getTasks();
@@ -51,17 +51,18 @@ export class AppComponent implements OnInit {
   }
 
   getTasks() {
-  	let self = this;
+  	var self = this;
     this.appService
     	.getTasks(this.get.data)
     	.done(function (response) {
+        console.log("response: ", response)
     		self.setLastPage(response.message.total_task_count);
     		self.get.response = response;
 			});
   }
 
   postTask() {
-  	let self = this;
+  	var self = this;
   	this.appService
     	.postTask(this.post.data)
     	.done(function (response) {
@@ -74,10 +75,11 @@ export class AppComponent implements OnInit {
   }
   
   updateTask() {
-  	let self = this;
+  	var self = this;
   	this.appService.updateTask(this.post.data)
   		.done(function (response) {
 			  self.changeView('taskList');
+        console.log("response: ", response);
 			});
   }
 
@@ -88,8 +90,8 @@ export class AppComponent implements OnInit {
   }	
 
   authorize(username, password) {
-  	let message = {username: "", password: ""};
-  	let status = "";
+  	var message = {username: "", password: ""};
+  	var status = "";
   	if (username !== 'admin' ) {
   		status = "error";
   		message.username = "Неверный логин";
@@ -118,8 +120,8 @@ export class AppComponent implements OnInit {
   //File upload and image preview
 
   fileUpload(imageFile, previewImg) {
-  	let file = imageFile.files[0];
-  	let self = this;
+  	var file = imageFile.files[0];
+  	var self = this;
 
   	var reader = new FileReader();
   	reader.readAsDataURL(file);
@@ -164,7 +166,7 @@ export class AppComponent implements OnInit {
 		var blobBin = atob(dataURL.split(',')[1]);
 		var array = [];
 		for(var i = 0; i < blobBin.length; i++) {
-		    array.push(blobBin.charCodeAt(i));
+		  array.push(blobBin.charCodeAt(i));
 		}
 		var resizedImagefile = new Blob([new Uint8Array(array)], {type: 'image/png'});
 		return resizedImagefile;
