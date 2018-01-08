@@ -63,7 +63,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var AppComponent = (function () {
     function AppComponent(appService) {
         this.appService = appService;
-        this.view = { currentView: "taskList" };
         this.get = {
             data: { sort_field: "id", sort_direction: "desc", page: 1 },
             response: { status: "", message: {} }
@@ -76,11 +75,12 @@ var AppComponent = (function () {
             data: { username: "", password: "", isAdmin: false },
             response: { status: "", message: {} }
         };
+        this.view = { currentView: "taskList" };
+        this.adminEdit = false;
         this.currentPage = 1;
         this.startPage = 1;
         this.lastPage = 1;
         this.pageCapacity = 3;
-        this.adminEdit = false;
     }
     AppComponent.prototype.ngOnInit = function () {
         this.getTasks();
@@ -99,6 +99,7 @@ var AppComponent = (function () {
         this.appService
             .getTasks(this.get.data)
             .done(function (response) {
+            console.log("response: ", response);
             self.setLastPage(response.message.total_task_count);
             self.get.response = response;
         });
@@ -121,6 +122,7 @@ var AppComponent = (function () {
         this.appService.updateTask(this.post.data)
             .done(function (response) {
             self.changeView('taskList');
+            console.log("response: ", response);
         });
     };
     AppComponent.prototype.editTask = function (task) {
@@ -319,15 +321,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var AppService = (function () {
     function AppService() {
-        this.onPageChange$ = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* EventEmitter */]();
-        this.onReceiveTotalTaskCount$ = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* EventEmitter */]();
     }
-    AppService.prototype.onPageChange = function (pageInfo) {
-        this.onPageChange$.emit(pageInfo);
-    };
-    AppService.prototype.onReceiveTotalTaskCount = function (count) {
-        this.onReceiveTotalTaskCount$.emit(count);
-    };
     AppService.prototype.getTasks = function (query) {
         var settings = {
             "async": true,
@@ -359,18 +353,11 @@ var AppService = (function () {
         return $.ajax(settings);
     };
     AppService.prototype.updateTask = function (data) {
-        var masText = data.text.split("");
-        masText.sort(function (a, b) {
-            if (a < b)
-                return 1;
-            if (a > b)
-                return -1;
-            return 0;
-        });
-        var dataText = masText.join("");
-        var params_string = "status=" + data.status + "&token=beejee";
+        var text = encodeURIComponent(data.text);
+        var params_string = "status=" + data.status + "&text=" + text + "&token=beejee";
         var form = new FormData();
         form.append("status", data.status);
+        form.append("text", data.text);
         form.append("token", "beejee");
         form.append("signature", __WEBPACK_IMPORTED_MODULE_1_md5__(params_string));
         var settings = {
