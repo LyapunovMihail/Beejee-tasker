@@ -1,33 +1,36 @@
 <div class="container">
+<div class="row">
+<div class="col-lg-1"></div>
+<div class="col-lg-10">
 
-  <div class="dropdown mt-5 mb-5" *ngIf="user.response.status!=='ok'">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="auth" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <div class="dropdown mt-5 mb-5" *ngIf="authUser.response.status!=='ok'">
+    <button class="btn btn-dark dropdown-toggle" type="button" id="auth" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Войти
     </button>
     <form class="dropdown-menu p-4">
       <div class="form-group">
         <label for="authEmail">Логин</label>
         <input type="text" class="form-control" 
-        [class.is-invalid]="(authName.touched && authName.invalid) || user.response.message.username" 
+        [class.is-invalid]="(authName.touched && authName.invalid) || authUser.response.message.username" 
         id="authName" name="authName" placeholder="Введите имя" 
-        [(ngModel)]="user.data.username" #authName="ngModel" 
-        (input)="user.response.message.username = ''" required>
-        <div class="invalid-feedback" *ngIf="(authName.touched && authName.invalid) || user.response.message.username">Неверный логин</div>
+        [(ngModel)]="authUser.data.username" #authName="ngModel" 
+        (input)="authUser.response.message.username = ''" required>
+        <div class="invalid-feedback" *ngIf="(authName.touched && authName.invalid) || authUser.response.message.username">Неверный логин</div>
       </div>
       <div class="form-group">
         <label for="authPassword">Пароль</label>
         <input type="password" class="form-control" 
-        [class.is-invalid]="(authPass.touched && authPass.invalid) || user.response.message.password" 
+        [class.is-invalid]="(authPass.touched && authPass.invalid) || authUser.response.message.password" 
         id="authPass" name="authPass" placeholder="Введите пароль" 
-        [(ngModel)]="user.data.password" #authPass="ngModel" 
-        (input)="user.response.message.password = ''" required> 
-        <div class="invalid-feedback" *ngIf="(authPass.touched && authPass.invalid) || user.response.message.password">Неверный пароль</div>
+        [(ngModel)]="authUser.data.password" #authPass="ngModel" 
+        (input)="authUser.response.message.password = ''" required> 
+        <div class="invalid-feedback" *ngIf="(authPass.touched && authPass.invalid) || authUser.response.message.password">Неверный пароль</div>
       </div>
-      <button type="submit" class="btn btn-primary" (click)="authorize(user.data.username, user.data.password)">Войти</button>
+      <button type="submit" class="btn btn-primary" (click)="authorize(authUser.data.username, authUser.data.password)">Войти</button>
     </form>
   </div>
 
-  <div class="mt-5 mb-5" *ngIf="user.response.status==='ok'">
+  <div class="mt-5 mb-5" *ngIf="authUser.response.status==='ok'">
     <button type="button" class="btn btn-dark" (click)="unAuthorize()">Выход админа</button>
   </div>
 
@@ -38,25 +41,25 @@
   <div *ngIf="view.currentView=='taskList' && get.response.status=='ok'">
     <div class="row ml-1 mb-4">
       <div class="mr-3">
-        <button type="button" class="btn btn-sm btn-success" (click)="changeView('taskEdit')">Создать задачу +</button>
+        <button type="button" class="btn btn-sm btn-secondary" (click)="changeView('taskEdit')">Создать задачу +</button>
       </div>
       <div class="dropdown">
         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="sortMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Сортировать по</button>
         <div class="dropdown-menu" aria-labelledby="sortMenu">
-          <button class="dropdown-item" type="button" (click)="get.data.sort_field='username'; toPage(1)">Имени пользователя</button>
-          <button class="dropdown-item" type="button" (click)="get.data.sort_field='email'; toPage(1)">Email</button>
-          <button class="dropdown-item" type="button" (click)="get.data.sort_field='status'; toPage(1)">Статусу</button>
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='username'; get.data.sort_direction='asc'; toPage(1)">Имени пользователя</button>
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='email'; get.data.sort_direction='asc'; toPage(1)">Email</button>
+          <button class="dropdown-item" type="button" (click)="get.data.sort_field='status'; get.data.sort_direction='asc'; toPage(1)">Статусу</button>
         </div>
       </div>
     </div>
 
-    <div class="row ml-1 mr-1">
+    <div class="ml-1 mr-1">
       <div class="card bg-light border-secondary mb-3 card-size" *ngFor="let task of get.response.message.tasks">
         <h5 class="card-header">{{task.username}} 
           <span class="text-muted">({{task.email}}) </span>
           <span class="badge badge-info" *ngIf="!task.status">Не выполнено</span>
           <span class="badge badge-dark" *ngIf="task.status">Выполнено</span> 
-          <button type="button" class="btn btn-sm btn-link float-right" *ngIf="user.data.isAdmin" (click)="editTask(task)">Редактировать</button>
+          <button type="button" class="btn btn-sm btn-link float-right" *ngIf="authUser.data.isAdmin" (click)="editTask(task)">Редактировать</button>
         </h5>         
         <div class="card-body" style="overflow: auto">
           <div class="max-width-100" style="display: inline-flex" >
@@ -95,7 +98,7 @@
   </div>    
 
   <div *ngIf="view.currentView=='taskEdit'">
-    <form class="col-md-8">
+    <form>
       <div class="form-row">
         <div class="form-group col-md-6">
           <label for="username">Имя пользователя</label>
@@ -135,7 +138,7 @@
         <div class="modal-dialog modal-lg" role="document">
           <div class="modal-content">
             <div class="modal-body">
-              <div class="row ml-1 mr-1">
+              <div class="ml-1 mr-1">
                 <div class="card bg-light mb-3 card-size">
                   <h5 class="card-header">{{post.data.username}} <span class="text-muted" *ngIf="post.data.email">({{post.data.email}}) </span></h5>  
                   <div class="card-body" style="overflow: auto">
@@ -163,4 +166,6 @@
     </form>
   </div>
 
+</div>
+</div>
 </div>
