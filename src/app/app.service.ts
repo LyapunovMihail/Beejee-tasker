@@ -42,8 +42,8 @@ export class AppService {
   }
 
   updateTask(data) {
-		var params_string = `status=${data.status}&text=${data.text}&token=beejee`;
-    params_string = encodeURI(params_string);
+		var text = encodeURIComponent(data.text);
+    var params_string = `status=${data.status}&text=${text}&token=beejee`;
     
   	var form = new FormData();     
       form.append("status", data.status);
