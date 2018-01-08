@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
 		response: {status: "", message: {}}
 	};
 
-	user = {
+	authUser = {
 		data: {username: "", password: "", isAdmin: false},
 		response: {status: "", message: {}}
 	};
@@ -41,10 +41,12 @@ export class AppComponent implements OnInit {
   }
 
   changeView(view) {
-		this.post.data = {image: null, username: "", email: "", text: ""};
-		this.post.response = {status: "", message: {}};
-		this.adminEdit = false;
-  	this.toPage(1);
+    if (view == 'taskList') {
+  		this.post.data = {image: null, username: "", email: "", text: ""};
+  		this.post.response = {status: "", message: {}};
+  		this.adminEdit = false;
+    	this.toPage(1);
+    }
   	this.view.currentView = view;
   }
 
@@ -98,15 +100,15 @@ export class AppComponent implements OnInit {
   	}
   	if (status !== "error") {
   		status = "ok";
-  		this.user.data.isAdmin = true;
+  		this.authUser.data.isAdmin = true;
   	}
-  	this.user.response.status = status;
-  	this.user.response.message = message;
+  	this.authUser.response.status = status;
+  	this.authUser.response.message = message;
   	this.changeView('taskList');
   }
 
   unAuthorize() {
-  	this.user = {
+  	this.authUser = {
 			data: {username: "", password: "", isAdmin: false},
 			response: {status: "", message: {}}
 		}
