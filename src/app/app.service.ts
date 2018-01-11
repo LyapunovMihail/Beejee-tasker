@@ -43,7 +43,6 @@ export class AppService {
 
   updateTask(data) {
     var text = encodeURIComponent(data.text);
-
     var params_string = `status=${data.status}&text=${text}&token=beejee`;
     
   	var form = new FormData();     
