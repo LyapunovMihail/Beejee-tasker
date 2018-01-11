@@ -141,13 +141,13 @@ var AppComponent = (function () {
             status = "error";
             message.password = "Неверный пароль";
         }
+        this.authUser.response.status = status;
+        this.authUser.response.message = message;
         if (status !== "error") {
             status = "ok";
             this.authUser.data.isAdmin = true;
+            this.changeView('taskList');
         }
-        this.authUser.response.status = status;
-        this.authUser.response.message = message;
-        this.changeView('taskList');
     };
     AppComponent.prototype.unAuthorize = function () {
         this.authUser = {
